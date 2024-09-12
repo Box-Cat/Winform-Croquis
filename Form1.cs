@@ -9,7 +9,9 @@ namespace Croquis
         int hour = 0;
         int min = 0;
         int sec = 0;
-        bool timerFlag = false;
+        int tempHour = 0;
+        int tempMin = 0;
+        int tempSec = 0;
         bool sizeToggled = false;
 
         public Form1()
@@ -102,15 +104,16 @@ namespace Croquis
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            timerFlag = true;
             timer.Enabled = true;
             timer.Start();
             // TryParse로 입력값을 안전하게 변환
             if (!int.TryParse(textBoxHour.Text, out hour)) hour = 0;
             if (!int.TryParse(textBoxMin.Text, out min)) min = 0;
             if (!int.TryParse(textBoxSec.Text, out sec)) sec = 0;
+            tempHour = hour;
+            tempMin = min;
+            tempSec = sec;
 
-            // 시간과 분은 60 이상이 될 수 없도록 체크
             if (min >= 60 || sec >= 60)
             {
                 MessageBox.Show("시간과 분은 60 이상일 수 없습니다.", "잘못된 입력", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -120,14 +123,14 @@ namespace Croquis
 
         private void btnPause_Click(object sender, EventArgs e)
         {
-            if (timerFlag == false)
+            if (timer.Enabled == false)
             {
-                timerFlag = true;
+                timer.Enabled = true;
                 timer.Start();
             }
             else
             {
-                timerFlag = false;
+                timer.Enabled = false;
                 timer.Stop();
             }
         }
@@ -143,7 +146,6 @@ namespace Croquis
             textBoxMin.Text = min.ToString();
             textBoxSec.Text = sec.ToString();
 
-            timerFlag = false;
             timer.Stop();
             timer.Enabled = false;
         }
@@ -151,14 +153,8 @@ namespace Croquis
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            sec--;
-
             if (hour == 0 && min == 0 && sec == 0)
             {
-                sec = 0;
-                timerFlag = false;
-                timer.Stop();
-                timer.Enabled = false;
                 if (idx == bitmapsList.Count - 1)
                 {
                     idx = 0;
@@ -169,6 +165,13 @@ namespace Croquis
                     idx++;
                     picBox.Image = bitmapsList[idx];
                 }
+                hour = tempHour;
+                min = tempMin;
+                sec = tempSec;
+                textBoxHour.Text = hour.ToString();
+                textBoxMin.Text = min.ToString();
+                textBoxSec.Text = sec.ToString();
+
             }
             else if (sec == 0)
             {
@@ -182,6 +185,10 @@ namespace Croquis
                     min--;
                 }
                 sec = 59;
+            }
+            else 
+            {
+                sec--;
             }
 
             textBoxHour.Text = hour.ToString();
